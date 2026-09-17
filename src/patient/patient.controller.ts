@@ -1,5 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  NotFoundException,
+} from '@nestjs/common';
 import { PatientService } from './patient.service.js';
+import { CreatePatientDto } from './DTO/create.patient.DTO.js';
+import { UpdatePatientDTO } from './DTO/update.patient.DTO.js';
 
 @Controller('patient')
 export class PatientController {
@@ -8,5 +19,29 @@ export class PatientController {
   @Get()
   findAll() {
     return this.patientService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const patient = await this.patientService.findOne(+id);
+    if (!patient) {
+      throw new NotFoundException(`Paciente con id: ${id} no encontrado`);
+    }
+    return patient;
+  }
+
+  @Post()
+  create(@Body() dto: CreatePatientDto) {
+    return this.patientService.create(dto);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdatePatientDTO) {
+    return this.patientService.update(Number(id), dto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.patientService.remove(Number(id));
   }
 }
