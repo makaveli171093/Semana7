@@ -26,19 +26,7 @@ export class DoctorService {
   }
 
   async create(dto: CreateDoctorDto) {
-    try {
-      return await this.prisma.doctor.create({ data: dto });
-    } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2003'
-      ) {
-        throw new BadRequestException(
-          `La especialidad con id ${dto.specialtyId} no existe`,
-        );
-      }
-      throw error;
-    }
+    return await this.prisma.doctor.create({ data: dto });
   }
 
   update(id: number, dto: UpdateDoctorDto) {
