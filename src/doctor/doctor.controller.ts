@@ -7,17 +7,13 @@ import {
   Param,
   Body,
   NotFoundException,
-  UseGuards,
 } from '@nestjs/common';
 import { DoctorService } from './doctor.service.js';
 import { CreateDoctorDto } from './DTO/create.doctor.dto.js';
 import { UpdateDoctorDto } from './DTO/update.doctor.dto.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @Controller('doctor')
-@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('RECEPCIONISTA')
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
