@@ -11,8 +11,10 @@ import {
 import { DoctorService } from './doctor.service.js';
 import { CreateDoctorDto } from './DTO/create.doctor.dto.js';
 import { UpdateDoctorDto } from './DTO/update.doctor.dto.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @Controller('doctor')
+@Roles('RECEPCIONISTA')
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
@@ -36,7 +38,7 @@ export class DoctorController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: CreateDoctorDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateDoctorDto) {
     return this.doctorService.update(Number(id), dto);
   }
 

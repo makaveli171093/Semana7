@@ -11,8 +11,10 @@ import {
 import { PatientService } from './patient.service.js';
 import { CreatePatientDto } from './DTO/create.patient.DTO.js';
 import { UpdatePatientDTO } from './DTO/update.patient.DTO.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @Controller('patient')
+@Roles('RECEPCIONISTA')
 export class PatientController {
   constructor(private readonly patientService: PatientService) {}
 
