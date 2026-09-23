@@ -10,19 +10,24 @@ export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
   async register(dto: RegisterDto) {
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    return this.prisma.user.create({
-      data: {
-        email: dto.email,
-        password: passwordHash,
-        role: dto.role as any,
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-      },
-    });
+    try {
+      const passwordHash = await bcrypt.hash(dto.password, 10);
+      return this.prisma.user.create({
+        data: {
+          email: dto.email,
+          password: passwordHash,
+          role: dto.role as any,
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+        },
+      });
+    } catch (error) {
+      console.error('ERROR EN REGISTER:', error);
+      throw error;
+    }
   }
 
   async login(dto: LoginDto) {
