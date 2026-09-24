@@ -4,10 +4,14 @@ import jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RegisterDto } from './DTO/register.dto.js';
 import { LoginDto } from './DTO/login.dto.js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async register(dto: RegisterDto) {
     try {
@@ -39,11 +43,13 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    const secret = this.configService.get<string>('JWT_SECRET') as string;
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET as string,
+      secret,
       { expiresIn: '8h' },
     );
+    return { token };
 
     return { token };
   }
