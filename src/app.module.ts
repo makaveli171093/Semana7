@@ -10,6 +10,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 import { AppointmentModule } from './appointment/appointment.module.js';
+import { ConfigModule } from '@nestjs/config';
+import Joi from 'joi';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -21,6 +23,15 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appKey: 'YOUR_APP_KEY',
       appSecret: 'YOUR_APP_SECRET',
       serviceId: 'clinica_salud_integral-nest-js',
+    }),
+
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().min(10).required(),
+        PORT: Joi.number().default(3000),
+      }),
     }),
     PrismaModule,
     PatientModule,
