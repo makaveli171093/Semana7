@@ -112,3 +112,25 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## Arquitectura y Ciclo de Vida del Request (Pipeline de NestJS)
+
+Para una petición típica como `POST /appointment`, el flujo de procesamiento se ejecuta en el siguiente orden:
+
+1. **Guards (`JwtAuthGuard` & `RolesGuard`):**
+   - Interceptan la petición antes de cualquier procesamiento.
+   - `JwtAuthGuard` verifica la validez y expiración del Bearer Token (si la ruta esta definida como `@Public()` lo omite).
+   - `RolesGuard` valida si el rol del payload (`user.role`) tiene permisos autorizados mediante el decorador `@Roles(...)`.
+2. **Logging Interceptor (`LoggingInterceptor` - Pre-handler):**
+   - Captura el método, la URL y registra la marca de tiempo inicial (`start = Date.now()`).
+3. **Pipes (`ValidationPipe`):**
+   - Transforma el JSON del payload entrante a la instancia de `CreateAppointmentDto`.
+   - Ejecuta las reglas de `class-validator` (`@IsDateString`, `@IsInt`, etc.). Si los tipos o valores no coinciden, rechaza la solicitud de inmediato con un error `400 Bad Request`.
+4. **Controller & Service (`AppointmentController` -> `AppointmentService`):**
+   - El controlador delega la operación al servicio.
+   - `AppointmentService` invoca `PatientService.findOne()` (comunicación entre módulos) para verificar la existencia del paciente.
+   - Si no existe, lanza un `NotFoundException` (`404`). Si existe, persiste la cita en PostgreSQL mediante `PrismaService`.
+5. **Exception Filters (`PrismaExceptionFilter`):**
+   - Si ocurre un fallo en el motor de base de datos (por ejemplo, violaciones de llaves foráneas o restricciones de unicidad), el filtro traduce el código de error de Prisma (como `P2002` o `P2025`) en una respuesta HTTP legible y estándar.
+6. **Logging Interceptor (`LoggingInterceptor` - Post-handler vía RxJS `tap`):**
+   - Una vez finalizada la respuesta (exitosa o con excepción), calcula los milisegundos transcurridos y registra en consola el formato: `[HTTP] POST /appointment — Xms`.
