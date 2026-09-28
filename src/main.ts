@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { PrismaExceptionFilter } from './prisma/prisma-exception.filter.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/logging.interceptor.js';
+import { TransformInterceptor } from './common/transform.interceptor.js';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -22,7 +23,10 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new PrismaExceptionFilter());
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformInterceptor(),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Clínica Salud Integral')

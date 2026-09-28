@@ -36,4 +36,8 @@ export class CreateAppointmentDto {
   @IsOptional()
   @IsString({ message: 'El motivo debe ser una cadena de texto' })
   reason?: string;
+
+  @IsOptional()
+  @IsString({ message: 'El estado debe ser una cadena de texto' })
+  status?: string;
 }

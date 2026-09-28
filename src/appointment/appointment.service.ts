@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { PatientService } from '../patient/patient.service.js';
+import { CreateAppointmentDto } from './DTO/create-appointment.dto.js';
 
 @Injectable()
 export class AppointmentService {
@@ -10,13 +11,7 @@ export class AppointmentService {
     private readonly patientService: PatientService,
   ) {}
 
-  async create(data: {
-    scheduledAt: string;
-    patientId: number;
-    doctorId: number;
-    reason?: string;
-    status?: any;
-  }) {
+  async create(data: CreateAppointmentDto) {
     const patient = await this.patientService.findOne(Number(data.patientId));
     if (!patient) {
       throw new NotFoundException('El paciente no existe');
@@ -24,11 +19,10 @@ export class AppointmentService {
 
     return this.prisma.appointment.create({
       data: {
-        scheduledAt: new Date(data.scheduledAt),
+        scheduledAt: new Date(data.dateTime),
         patientId: Number(data.patientId),
         doctorId: Number(data.doctorId),
         reason: data.reason,
-        status: data.status ?? undefined,
       },
     });
   }
